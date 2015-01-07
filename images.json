@@ -1,0 +1,23 @@
+{
+	"cat":[
+		"img/cat/1.jpg",
+		"img/cat/2.jpg",
+		"img/cat/3.jpg",
+		"img/cat/4.jpg",
+		"img/cat/5.jpg"
+	],
+	"dog":[
+		"img/dog/1.jpg",
+		"img/dog/2.jpg",
+		"img/dog/3.jpg",
+		"img/dog/4.jpg",
+		"img/dog/5.jpg"
+	],
+	"hamster":[
+		"img/hamster/1.jpg",
+		"img/hamster/2.jpg",
+		"img/hamster/3.jpg",
+		"img/hamster/4.jpg",
+		"img/hamster/5.jpg"
+	]
+}

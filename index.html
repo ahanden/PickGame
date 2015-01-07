@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+		img[src="img/life.png"] {
+			height: 72px;
+		}
+		div#top-bar {
+			font-family:arial;
+			font-size:28px;
+		}
+		div#lives-label {
+			float: left;
+		}
+		div#lives {
+			float:left;
+		}
+		div#score-label {
+			float:right;
+		}
+		div#score {
+			float: right;
+		}
+		div#top-bar {
+			height: 60px;
+		}
+		div#cover, div#cover-win, div#cover-lose {
+			position: absolute;
+			top: 115px;
+			left: 50%;
+		}
+		div#cover > div, div#cover-win > div, div#cover-lose > div{
+			position: relative;
+			left: -50%;
+			width: 200px;
+			height: 200px;
+			text-align: center;
+			background-color: #000;
+		}
+		div#image {
+			width: 200px;
+			height: 200px;
+			background-color: #000;
+			margin-left:auto;
+			margin-right:auto;
+			background-size: cover;
+		}
+		button#start {
+			margin-top:45%;
+		}
+		div#buttons {
+			margin-top: 30px;
+			text-align:center;
+		}
+		#timer {
+      background-color: #000;
+      -webkit-border-radius: 13px;
+			-moz-border-radius: 13px;
+			-o-border-radius: 13px;
+			border-radius: 13px;
+      padding: 3px;
+			width: 200px;
+			margin-left: auto;
+			margin-right: auto;
+			margin-bottom: 20px;
+    }
+    #timer > div {
+      background-color: #fa0;
+      width: 0%;
+      height: 20px;
+      border-radius: 10px;
+		}
+		#buttons button {
+			background-color:#44c767;
+			-moz-border-radius:42px;
+			-webkit-border-radius:42px;
+			border-radius:42px;
+			border:3px solid #18ab29;
+			display:inline-block;
+			cursor:pointer;
+			color:#ffffff;
+			font-family:arial;
+			font-size:28px;
+			padding:3px 12px;
+			text-decoration:none;
+			text-shadow:0px 1px 0px #2f6627;
+		}
+		#buttons button:hover {
+			background-color:#2abd65;
+		}
+		#buttons button:active {
+			position:relative;
+			top:1px;
+		}
+		#buttons button:disabled, #start:disabled, #start:disabled:hover {
+			background-color:#ddd;
+			cursor:default;
+			border-color:#aaa;
+			color: #000;
+		}
+		#start {
+			background-color:#2dabf9;
+			-moz-border-radius:28px;
+			-webkit-border-radius:28px;
+			border-radius:28px;
+			border:1px solid #0b0e07;
+			display:inline-block;
+			cursor:pointer;
+			color:#ffffff;
+			font-family:arial;
+			font-size:26px;
+			padding:4px 20px;
+			text-decoration:none;
+			text-shadow:0px 1px 0px #263666;
+		}
+		#start:hover {
+			background-color:#0688fa;
+		}
+		#start:active {
+			position:relative;
+			top:1px;
+		}
+		.footer {
+			margin-top: 40px;
+			text-align: center;
+		}
+		</style>
+	</head>
+		<body>
+		<div id="top-bar">
+				<div id="lives-label">Lives:</div>
+				<div id="lives">
+					<img src="img/life.jpg">
+					<img src="img/life.jpg">
+					<img src="img/life.jpg">
+				</div>
+				<div id="score">0</div>
+				<div id="score-label">Score:</div>
+		</div>
+		<div id="cover">
+				<div>
+						<button type="button" id="start" disabled>Loading...</button>
+				</div>
+		</div>
+		<div id="cover-win" hidden>
+			<div>
+				<img src="img/right.png" />
+			</div>
+		</div>
+		<div id="cover-lose" hidden>
+			<div>
+				<img src="img/wrong.png" />
+			</div>
+		</div>
+		<div id="timer"><div></div></div>
+		<div id="image"></div>
+		<div id="buttons">
+				<button type="button" id="AOM" disabled>Cat</button>
+				<button type="button" id="OME" disabled>Dog</button>
+				<button type="button" id="None" disabled>Hamster</button>
+		</div>
+		<div class="footer">
+			&copy;University of Pittsburgh Medical Center<br>
+			Designed by <a href="adamhanden.com">Adam Handen</a>.
+		</div>
+		<script src="jquery-1.11.0.min.js"></script>
+		<script>
+var type; // Whether looking at AOM, OME, or none
+var time = 100; // Time left on the clock
+var timer; // The active timer
+var images; // The JSON of images to use
+var score = 0;
+
+// Restarts the timer
+function setTimer() {
+	$("#timer > div").css("width","100%");
+	time = 100;
+	return setInterval(function () {
+		time -= 1 + score / 100;
+		$("#timer > div").css("width",time+"%");
+		if(time <= 0) {
+			wrongAnswer();
+		}
+	}, 25);
+}
+
+// Setup the game
+$(document).ready(function(){
+	// Load the images
+	$.ajax({
+		url: "images.json",
+		dataType: 'json',
+		error: function(e) {
+			alert("Sorry, but something appears to have gone wrong. Try refreshing the page.");
+		},
+		success: function(json) {
+			$("#start").attr("disabled",false).html("Start");
+			images = json;
+			nextImage();
+		}
+	});
+});
+
+// Start the game
+$(document).on("click","#start",function() {
+	$("#buttons button").attr("disabled",false);
+	score = 0;
+	$("#score").html(score);
+	$("#cover").hide();
+	timer = setTimer();
+});
+
+// Check answers by button press
+$(document).on("click","#AOM",function(){
+	if(type == 0)
+		rightAnswer();
+	else
+		wrongAnswer();
+});
+$(document).on("click","#OME",function(){
+	if(type == 1)
+		rightAnswer();
+	else
+		wrongAnswer();
+});
+$(document).on("click","#None",function(){
+	if(type == 2)
+		rightAnswer();
+	else
+		wrongAnswer();
+});
+
+// Check answers by key press
+$(document).on("keypress", function(event){
+	// A key
+	if(!$("#AOM").prop("disabled")) {
+		if(event.which == 97 || event.which == 65) {
+			if(type == 0)
+				rightAnswer();
+			else
+				wrongAnswer();
+		}
+		// O key
+		else if(event.which == 111 || event.which == 79) {
+			if(type == 1)
+				rightAnswer();
+			else
+				wrongAnswer();
+		}
+		// N key
+		else if(event.which == 110 || event.which == 78) {
+			if(type == 2)
+				rightAnswer();
+			else
+				wrongAnswer();
+		}
+	}
+})
+
+// Correct answer response
+function rightAnswer() {
+	window.clearTimeout(timer); // Stop the timer
+	$("#buttons button").attr("disabled",true); // Prevent input
+	
+	// Increment the score
+	score += 1 + parseInt(time / 10)
+	$("#score").html(score);
+	
+	// Show the victory splash
+	$("#cover-win").show();
+	
+	nextImage(); // Load the next ear image
+	
+	// Start next round after 1 second
+	window.setTimeout(function(){
+		$("#buttons button").attr("disabled",false);
+		$("#cover-win").hide();
+		$("#timer > div").css("width","100%")
+		timer = setTimer();
+	},1000);
+}
+
+// Wrong answer response
+function wrongAnswer() {
+	window.clearTimeout(timer); // Stop the timer
+	$("#buttons button").attr("disabled",true); // Prevent input
+	$($("#lives img")[0]).remove(); // Decrement the lives
+	
+	// Show the failure splash
+	$("#cover-lose").show();
+	
+	nextImage(); // Load the next image
+	
+	// Start the next round after 1 second
+	// (Or end the game if we're out of lives)
+	window.setTimeout(function(){
+		$("button").attr("disabled",false);
+		$("#cover-lose").hide();
+		if($("#lives img").length <= 0) {
+			$("#buttons button").attr("disabled",true);
+			$("#cover").show();
+			$("#lives").append("<img src='img/life.jpg'>");
+			$("#lives").append("<img src='img/life.jpg'>");
+			$("#lives").append("<img src='img/life.jpg'>");
+		}
+		else {
+			timer = setTimer();
+		}
+	},1000);
+}
+
+// Loads the next image
+function nextImage() {
+	type = parseInt(Math.random() * 3);
+	if(type == 0) {
+		index = parseInt(Math.random() * images.cat.length);
+		$("#image").css("background-image",'url('+images.cat[index]+')');
+	}
+	else if(type == 1) {
+		index = parseInt(Math.random() * images.dog.length);
+		$("#image").css("background-image",'url('+images.dog[index]+')');
+	}
+	else if(type == 2) {
+		index = parseInt(Math.random() * images.hamster.length);
+		$("#image").css("background-image",'url('+images.hamster[index]+')');
+	}
+}
+		</script>
+		</body>
+</html>
